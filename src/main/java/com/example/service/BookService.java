@@ -7,52 +7,78 @@ import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
+
 /**
  * 书籍 Service
  * @author: sunshaoping
  * @date: Create by in 15:08 2018-11-16
  */
-@CacheConfig(cacheNames = "books")
+
 @Service
+@CacheConfig(cacheNames = "books")
 public class BookService {
 
-
-    /**
-     * 查询书籍
-     */
     @Cacheable
     public Book findBook(String isbn) {
-        return getBook(isbn);
+        System.out.println("查询,isbn=" + isbn);
+        return createBook(isbn);
     }
 
-    private Book getBook(String isbn) {
+    @Cacheable(key = "#isbn", sync = true)
+    public Book findBookSync(String isbn) {
+        System.out.println("查询,isbn=" + isbn);
+        try {
+            TimeUnit.SECONDS.sleep(2);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return createBook(isbn);
+    }
+
+    private Book createBook(String isbn) {
         Book book = new Book();
         book.setBookName("儿童故事集");
-        book.setId(1L);
+        book.setId(new Random().nextLong());
         book.setIsbn(isbn);
         return book;
     }
 
 
-    @Cacheable(key = "#isbn", condition = "#checkWarehouse")
-    public Book findBook(String isbn, boolean checkWarehouse, boolean includeUsed) {
-        return getBook(isbn);
+    @Cacheable(key = "#isbn", condition = "#totalPages > 100")
+    public Book findBookCondition(String isbn, int totalPages) {
+        return createBook(isbn);
+    }
+
+    @Cacheable(key = "#isbn", unless = "#totalPages > 100")
+    public Book findBookUnless(String isbn, int totalPages) {
+        return createBook(isbn);
     }
 
 
     @Cacheable(keyGenerator = "myKeyGenerator")
-    public Book findBook(String isbn, boolean checkWarehouse) {
-        return getBook(isbn);
+    public Book findBookKeyGenerator(String isbn) {
+        return createBook(isbn);
     }
 
-    public Book saveBook(Book book) {
-        book.setId(2L);
-        return book;
+    @Cacheable(key = "#isbn", cacheManager = "myCacheManager")
+    public Book findBookCacheManager(String isbn) {
+        return createBook(isbn);
     }
+
+
+    @Cacheable(cacheResolver = "myCacheResolver")
+    public Book findBookCacheResolver(String isbn) {
+        return createBook(isbn);
+    }
+
 
     @CachePut(key = "#book.isbn")
     public Book updateBook(Book book) {
-        return book.clone();
+        Book book1 = createBook(book.getIsbn());
+        book1.setBookName(book.getBookName());
+        return book1;
     }
 
     @CacheEvict(key = "#isbn")

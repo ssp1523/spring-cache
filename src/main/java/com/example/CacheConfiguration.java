@@ -1,8 +1,12 @@
 package com.example;
 
+import com.example.service.MyCacheManager;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCacheManager;
 import org.springframework.cache.support.CompositeCacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 
 import java.util.List;
 
@@ -13,16 +17,21 @@ import java.util.List;
  */
 @Configurable
 public class CacheConfiguration {
+    /**
+     * 默认缓存管理器
+     */
+    @Bean
+    @Primary
+    public ConcurrentMapCacheManager concurrentMapCacheManager() {
+        return new ConcurrentMapCacheManager();
+    }
 
     /**
-     * 缓存管理 配置
+     * 自定义缓存管理器
      */
-    //    @Bean
-    public CompositeCacheManager compositeCacheManager(List<CacheManager> cacheManagers) {
-        CompositeCacheManager compositeCacheManager = new CompositeCacheManager();
-        compositeCacheManager.setCacheManagers(cacheManagers);
-        compositeCacheManager.setFallbackToNoOpCache(true);
-        return compositeCacheManager;
+    @Bean
+    public MyCacheManager myCacheManager() {
+        return new MyCacheManager(new ConcurrentMapCacheManager());
     }
 
 

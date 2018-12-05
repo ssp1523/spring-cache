@@ -16,8 +16,8 @@ public class MyKeyGenerator implements KeyGenerator {
 
     @Override
     public Object generate(Object target, Method method, Object... params) {
-        System.out.println(target);
-        System.out.println(method);
-        return params[0];
+        String key = params[0] + "-MyKeyGenerator";
+        System.out.println(key);
+        return key;
     }
 }

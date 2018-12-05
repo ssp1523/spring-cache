@@ -1,0 +1,4 @@
+spring:
+  cache:
+    no-op-cache:
+      list: books
