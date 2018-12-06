@@ -30,8 +30,8 @@ public class BookServiceTest {
         Book book1 = bookService.findBook(ISBN);
         Book book2 = bookService.findBook(ISBN);
         Book book3 = bookService.findBook(ISBN);
-        assert book1 == book2;
-        assert book1 == book3;
+        assert book1.equals(book2);
+        assert book1.equals(book3);
     }
 
 
@@ -46,13 +46,6 @@ public class BookServiceTest {
 
 
     @Test
-    public void findBookCacheManager() {
-        Book book1 = bookService.findBook(ISBN);
-        Book book2 = bookService.findBookCacheManager(ISBN);
-        assert book1 != book2;
-    }
-
-    @Test
     public void findBookCondition() {
         Book book1 = bookService.findBook(ISBN);
         Book book2 = bookService.findBookCondition(ISBN, 99);
@@ -60,6 +53,7 @@ public class BookServiceTest {
         assert book1 != book2;
         assert book3 == book1;
     }
+
     @Test
     public void findBookUnless() {
         Book book3 = bookService.findBookUnless(ISBN, 200);
@@ -71,19 +65,6 @@ public class BookServiceTest {
         assert book4 == book1;
     }
 
-    @Test
-    public void findBookCacheResolver() {
-        Book book1= bookService.findBookCacheResolver(ISBN);
-        Book book2 = bookService.findBookCacheResolver(ISBN);
-
-        assert book1 != book2;
-    }
-    @Test
-    public void findBookKeyGenerator() {
-        Book book1 = bookService.findBook(ISBN);
-        Book book2 = bookService.findBookKeyGenerator(ISBN);
-        assert book1 != book2;
-    }
 
     @Test
     public void saveBook() {

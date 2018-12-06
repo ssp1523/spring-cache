@@ -1,13 +1,16 @@
 package com.example.entity;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * 书籍
  * @author: sunshaoping
  * @date: Create by in 15:05 2018-11-16
  */
+
 public class Book implements Serializable {
+
 
     private Long id;
 
@@ -39,14 +42,6 @@ public class Book implements Serializable {
         this.isbn = isbn;
     }
 
-    @Override
-    public Book clone() {
-        Book book = new Book();
-        book.setId(this.id);
-        book.setIsbn(this.isbn);
-        book.setBookName(this.bookName);
-        return book;
-    }
 
     @Override
     public String toString() {
@@ -55,5 +50,22 @@ public class Book implements Serializable {
                 ", bookName='" + bookName + '\'' +
                 ", isbn='" + isbn + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        Book book = (Book) o;
+        return Objects.equals(id, book.id) &&
+                Objects.equals(bookName, book.bookName) &&
+                Objects.equals(isbn, book.isbn);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, bookName, isbn);
     }
 }

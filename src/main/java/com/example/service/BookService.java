@@ -57,23 +57,6 @@ public class BookService {
     }
 
 
-    @Cacheable(keyGenerator = "myKeyGenerator")
-    public Book findBookKeyGenerator(String isbn) {
-        return createBook(isbn);
-    }
-
-    @Cacheable(key = "#isbn", cacheManager = "myCacheManager")
-    public Book findBookCacheManager(String isbn) {
-        return createBook(isbn);
-    }
-
-
-    @Cacheable(cacheResolver = "myCacheResolver")
-    public Book findBookCacheResolver(String isbn) {
-        return createBook(isbn);
-    }
-
-
     @CachePut(key = "#book.isbn")
     public Book updateBook(Book book) {
         Book book1 = createBook(book.getIsbn());
