@@ -10,8 +10,7 @@ import java.util.Objects;
  */
 
 public class Book implements Serializable {
-
-
+    
     private Long id;
 
     private String bookName;
