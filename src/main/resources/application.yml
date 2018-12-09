@@ -5,5 +5,4 @@ spring:
   cache:
     redis:
       key-prefix: redis-cache
-      default-expiration: 20
     type: redis

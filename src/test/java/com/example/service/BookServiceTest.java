@@ -76,7 +76,7 @@ public class BookServiceTest {
         Book book1 = bookService.findBook(ISBN);
         bookService.removeBook(ISBN);
         Book book2 = bookService.findBook(ISBN);
-        assert book1 != book2;
+        assert !book1.equals(book2);
     }
 
     @Test

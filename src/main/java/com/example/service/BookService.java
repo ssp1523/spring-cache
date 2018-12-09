@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.RedisCacheable;
 import com.example.entity.Book;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
@@ -20,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 @CacheConfig(cacheNames = "books")
 public class BookService {
 
-    @Cacheable
+    @RedisCacheable(expires = "PT1M")
     public Book findBook(String isbn) {
         System.out.println("查询,isbn=" + isbn);
         return createBook(isbn);

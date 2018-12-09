@@ -4,14 +4,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.boot.autoconfigure.cache.CacheProperties;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cache.annotation.CachingConfigurerSupport;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
+import org.springframework.data.redis.cache.RedisCacheManager;
+import org.springframework.data.redis.cache.RedisCacheWriter;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Field;
 
 /**
  * redis缓存配置
@@ -20,20 +25,22 @@ import org.springframework.util.StringUtils;
  */
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
-public class MyRedisCacheConfiguration extends CachingConfigurerSupport {
+public class RedisCacheConfig extends CachingConfigurerSupport {
 
     private final CacheProperties cacheProperties;
 
-    public MyRedisCacheConfiguration(CacheProperties cacheProperties) {this.cacheProperties = cacheProperties;}
+
+    public RedisCacheConfig(CacheProperties cacheProperties) {
+        this.cacheProperties = cacheProperties;
+    }
 
     /**
      * 覆盖reids默认配置
      */
     @Bean
-    org.springframework.data.redis.cache.RedisCacheConfiguration redisCacheConfiguration() {
-
+    RedisCacheConfiguration redisCacheConfiguration() {
         CacheProperties.Redis redisProperties = this.cacheProperties.getRedis();
-        org.springframework.data.redis.cache.RedisCacheConfiguration config = org.springframework.data.redis.cache.RedisCacheConfiguration.defaultCacheConfig();
+        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig();
         //序列化
         ObjectMapper objectMapper = new ObjectMapper();
         // 4.设置可见度
@@ -64,5 +71,18 @@ public class MyRedisCacheConfiguration extends CachingConfigurerSupport {
         return config;
     }
 
+
+
+    @Bean("redisCacheResolver")
+    @ConditionalOnMissingBean
+    public RedisCacheResolver redisCacheResolver(RedisCacheManager redisCacheManager) throws NoSuchFieldException, IllegalAccessException {
+        RedisCacheConfiguration redisCacheConfiguration = redisCacheConfiguration();
+
+        Field cacheWriterField = RedisCacheManager.class.getDeclaredField("cacheWriter");
+        cacheWriterField.setAccessible(true);
+        RedisCacheWriter cacheWriter = (RedisCacheWriter) cacheWriterField.get(redisCacheManager);
+
+        return new RedisCacheResolver(cacheWriter, redisCacheManager, redisCacheConfiguration);
+    }
 
 }
